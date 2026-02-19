@@ -3,13 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine
 from .routers import post, user, auth, vote
+from .config import settings
 
 # models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[],
+    allow_origins=[settings.allowed_origins],#type: ignore
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],

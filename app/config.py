@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import List
 
 class Settings(BaseSettings): # type: ignore
     database_hostname: str
@@ -9,6 +10,7 @@ class Settings(BaseSettings): # type: ignore
     secret_key: str
     algorithm: str
     access_token_expire_time: int
+    allowed_origins: List[str] = ["*"]
 
     model_config = SettingsConfigDict(env_file=".env")
 
