@@ -11,7 +11,33 @@ from app.config import settings
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", f'postgresql+psycopg://{settings.database_username}:{settings.database_password}@{settings.database_hostname}/{settings.database_name}')
+def get_url():
+    # 1. Pull the URL from settings
+    if settings.neon and settings.neon.strip():
+        url = settings.neon
+    else:
+        url = (
+            f"postgresql+psycopg://{settings.database_username}:"
+            f"{settings.database_password}@{settings.database_hostname}:"
+            f"{settings.database_port}/{settings.database_name}"
+        )
+    
+    # 2. Fix the 'postgres://' prefix for SQLAlchemy 2.0
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+psycopg://", 1)
+    elif not url.startswith("postgresql+psycopg://"):
+         # Ensure the driver is always explicitly psycopg
+         url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+    # 3. Force SSL for Neon/Cloud (Required!)
+    if "sslmode" not in url:
+        sep = "&" if "?" in url else "?"
+        url += f"{sep}sslmode=require"
+        
+    return url
+
+# Set the final fixed URL into the Alembic config
+config.set_main_option("sqlalchemy.url", get_url())
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

@@ -10,6 +10,7 @@ class Settings(BaseSettings): # type: ignore
     algorithm: str
     access_token_expire_time: int
     allowed_origins: str= "*"
+    neon: str = ""
 
     model_config = SettingsConfigDict(env_file=".env")
 
